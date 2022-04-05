@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+	<div class="" style="background-image: url(assets/pictures/{{ destin.picture}});">
+
+		<img src="assets/pictures/{{ destin.picture }}" class="card-img-top" alt="...">
+
+		<div class="card-body">
+			<h5 class="card-title">{{ destin.place }}</h5>
+
+			<p class="card-text">{{ destin.des }}</p>
+
+		</div>
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item">{{ destin.country }}</li>
+
+			<li class="list-group-item">Price from
+				{{ destin.price }}
+				€</li>
+
+
+			<li class="list-group-item">In the section -
+				{{ destin.sect }}</li>
+
+		</ul>
+
+	</div>
+
+	<a class="btn btn-info" href="/">Back</a>
+{% endblock %}

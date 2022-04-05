@@ -4,30 +4,33 @@
 {% endblock %}
 
 {% block body %}
-	<div class=" row row-cols-1 row-cols-md-3 g-4">
+	<div class="row  row-cols-1 row-cols-md-3 " style=" margin-left:30px; text-align:center; gap:3rem;">
 
 
 		{% for dest in destin  %}
 
-			<div class="card" style="width: 18rem;">
+			<div class="card" style="width: 18rem; ">
 				<img src="assets/pictures/{{ dest.picture}}" class="card-img-top" alt="...">
 
 
 				<div class="card-body">
 					<h5 class="card-title">{{ dest.place }}</h5>
 
-					<p class="card-text">{{ dest.des }}</p>
 
-				</div>
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item">{{ dest.country }}</li>
+					<a href="/details/{{dest.id}}" class="card-link">
 
-					<li class="list-group-item">{{ dest.price }}</li>
+						<button>Wiew</button>
+					</a>
+					<a href="/edit/{{dest.id}}" class="card-link">
 
 
-				</ul>
-				<div class="card-body">
-					<a href="#" class="card-link">Only 4 places left Reserve Now</a>
+						<button>Edit</button>
+					</a>
+					<a href="/delete/{{dest.id}}" class="card-link">
+
+
+						<button>Delete</button>
+					</a>
 
 				</div>
 			</div>

@@ -5,9 +5,12 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
 
 use App\Entity\Destin;
+use App\Form\DestinType;
+use Symfony\Bridge\Doctrine\ManagerRegistry as DoctrineManagerRegistry;
 
 class DestinationController extends AbstractController
 {
@@ -25,41 +28,76 @@ class DestinationController extends AbstractController
 
 
     #[Route('/create', name: 'create_action')]
-    public function createAction(ManagerRegistry $doctrine)
+    public function create(Request $request, ManagerRegistry $doctrine): Response
     {
+        $destin = new Destin();
+        $form = $this->createForm(DestinType::class, $destin);
 
-        // you can fetch the EntityManager via $doctrine
-        $em = $doctrine->getManager();
-        $destination = new Destin(); // here we will create an object from our class Product.
+        $form->handleRequest($request);
 
-        $destination->setPlace('Kratovo');
-        $destination->setCountry('Macedonia');
-        $destination->setDes('Oldest town in the Balkans');
-        $destination->setLat('42.07836');
-        $destination->setLon('22.18194');
-        $destination->setSect('special');
-        $destination->setPicture('product.png'); // in our Product class we have a set function for each column in our db
-        $destination->setPrice(19);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $destin = $form->getData();
+            $em = $doctrine->getManager();
+            $em->persist($destin);
+            $em->flush();
 
-        // tells Doctrine you want to (eventually) save the Product (no queries yet)
-        $em->persist($destination);
-        // actually executes the queries (i.e. the INSERT query)
-        $em->flush();
-        return new Response('Saved new product with id' . $destination->getId());
+            $this->addFlash('notice', 'Destination Added');
+
+            return $this->redirectToRoute('index_action');
+        }
+
+
+        return $this->render('destination/create.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/details/{id}', name: 'details_action')]
-    public function showDetailsAction($id, ManagerRegistry $doctrine)
+    #[Route('/details/{id}', name: 'destin_details')]
+    public function details(ManagerRegistry $doctrine, $id): Response
     {
-        $destination = $doctrine
-            ->getRepository(Destin::class)
-            ->find($id);
-        if (!$destination) {
-            throw $this->createNotFoundException(
-                'No product found for id ' . $id
+        $destin = $doctrine->getRepository(Destin::class)->find($id);
+
+        return $this->render('destination/details.html.twig', ['destin' => $destin]);
+    }
+
+    #[Route('/edit/{id}', name: 'destin_edit')]
+    public function edit(Request $request, ManagerRegistry $doctrine, $id): Response
+    {
+        $destin = $doctrine->getRepository(Destin::class)->find($id);
+        $form = $this->createForm(DestinType::class, $destin);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $destin = $form->getData();
+
+            $em = $doctrine->getManager();
+            $em->persist($destin);
+            $em->flush();
+            $this->addFlash(
+                'notice',
+                'Destination Edited'
             );
-        } else {
-            return new Response('Details from the product with id ' . $id . ", Product name is " . $destination->getPlace() . " and it cost " . $destination->getPrice() . "€");
+
+            return $this->redirectToRoute('index_action');
         }
+
+        return $this->render('destination/edit.html.twig', ['form' => $form->createView()]);
+    }
+
+
+    #[Route('/delete/{id}', name: 'destin_delete')]
+    public function deleteDestin($id, ManagerRegistry $doctrine): Response
+    {
+
+        $destin = $doctrine->getManager()->getRepository(Destin::class)->find($id);
+        $em = $doctrine->getManager();
+        $em->remove($destin);
+
+        $em->flush();
+        $this->addFlash(
+            'notice',
+            'Destination Removed'
+        );
+
+        return $this->redirectToRoute('index_action');
     }
 }
