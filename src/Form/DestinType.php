@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Destin;
 
+
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
 
@@ -11,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 
 class DestinType extends AbstractType
@@ -39,8 +42,25 @@ class DestinType extends AbstractType
       ->add('sect', TextType::class, [
         'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px']
       ])
-      ->add('picture', TextType::class, [
-        'attr' => ['class' => 'form-control', 'style' => 'margin-bottom:15px']
+      ->add('picture', FileType::class, [
+        'label' => 'Upload Picture',
+        //unmapped means that is not associated to any entity property
+        'mapped' => false,
+        //not mandatory to have a file
+        'required' => false,
+
+        //in the associated entity, so you can use the PHP constraint classes as validators
+        'constraints' => [
+          new File([
+            'maxSize' => '5024k',
+            'mimeTypes' => [
+              'image/png',
+              'image/jpeg',
+              'image/jpg',
+            ],
+            'mimeTypesMessage' => 'Please upload a valid image file',
+          ])
+        ],
       ])
       ->add('save', SubmitType::class, [
         'label' => 'Add',

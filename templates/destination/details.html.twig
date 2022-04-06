@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-	<div class="" style="background-image: url(assets/pictures/{{ destin.picture}});">
+	<div class="">
 
-		<img src="assets/pictures/{{ destin.picture }}" class="card-img-top" alt="...">
+		<img src="{{asset('assets/pictures/' ~ destin.picture )}}" class="card-img-top" alt="...">
+
 
 		<div class="card-body">
 			<h5 class="card-title">{{ destin.place }}</h5>
@@ -20,6 +21,7 @@
 
 			<li class="list-group-item">In the section -
 				{{ destin.sect }}</li>
+
 
 		</ul>
 

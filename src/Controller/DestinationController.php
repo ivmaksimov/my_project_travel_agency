@@ -10,7 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 use App\Entity\Destin;
 use App\Form\DestinType;
-use Symfony\Bridge\Doctrine\ManagerRegistry as DoctrineManagerRegistry;
+use App\Service\FileUploader;
 
 class DestinationController extends AbstractController
 {
@@ -28,7 +28,7 @@ class DestinationController extends AbstractController
 
 
     #[Route('/create', name: 'create_action')]
-    public function create(Request $request, ManagerRegistry $doctrine): Response
+    public function create(Request $request, ManagerRegistry $doctrine, FileUploader $fileUploader): Response
     {
         $destin = new Destin();
         $form = $this->createForm(DestinType::class, $destin);
@@ -36,6 +36,12 @@ class DestinationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $pictureFile = $form->get('picture')->getData();
+            //pictureUrl is the name given to the input field
+            if ($pictureFile) {
+                $pictureFileName = $fileUploader->upload($pictureFile);
+                $destin->setPicture($pictureFileName);
+            }
             $destin = $form->getData();
             $em = $doctrine->getManager();
             $em->persist($destin);
@@ -59,14 +65,19 @@ class DestinationController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: 'destin_edit')]
-    public function edit(Request $request, ManagerRegistry $doctrine, $id): Response
+    public function edit(Request $request, ManagerRegistry $doctrine, $id, FileUploader $fileUploader): Response
     {
         $destin = $doctrine->getRepository(Destin::class)->find($id);
         $form = $this->createForm(DestinType::class, $destin);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            $pictureFile = $form->get('picture')->getData();
+            //pictureUrl is the name given to the input field
+            if ($pictureFile) {
+                $pictureFileName = $fileUploader->upload($pictureFile);
+                $destin->setPicture($pictureFileName);
+            }
             $destin = $form->getData();
 
             $em = $doctrine->getManager();
