@@ -12,6 +12,7 @@ use App\Entity\Destin;
 use App\Form\DestinType;
 use App\Service\FileUploader;
 
+#[Route('/destin')]
 class DestinationController extends AbstractController
 {
 
